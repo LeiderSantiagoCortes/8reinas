@@ -1,31 +1,23 @@
-from simulation import (
-    profit,
-    total_games,
-    games_won_by_robot,
-    games_won_by_professor,
-    SIMULATION_DURATION,
-    game_simulation,
-)
 import simpy
+from simulation import NQueensSimulation
+
+SIMULATION_TIME = 8 * 60 * 60  # 8 hours
 
 
 def main() -> None:
-    global profit, total_games, games_won_by_robot, games_won_by_professor
-
-    # Create the SimPy environment
+    """Main function to set up and run the simulation."""
+    print("Simulation Started.")
     env = simpy.Environment()
+    simulation = NQueensSimulation(env)
 
-    # Start the game simulation process
-    env.process(game_simulation(env))
+    # Start the process to generate robots
+    env.process(simulation.generate_robots())
 
     # Run the simulation for the specified duration
-    env.run(until=SIMULATION_DURATION)
+    env.run(until=SIMULATION_TIME)
 
-    # Display the results
-    print(f"Total profit: {profit}")
-    print(f"Total games: {total_games}")
-    print(f"Games won by the robot: {games_won_by_robot}")
-    print(f"Games won by the professor: {games_won_by_professor}")
+    # Print the total profit after simulation completion
+    print(f"Simulation completed. Total profit: {simulation.profit}")
 
 
 if __name__ == "__main__":
