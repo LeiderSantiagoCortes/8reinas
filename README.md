@@ -35,12 +35,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Run the simulation script:
-
-```sh
-python main.py
-```
-
 ## run project
 
 To run the project, use the following command:
