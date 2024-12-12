@@ -1,5 +1,6 @@
 from board import Board
 
+
 class DeterministicSolver:
     def __init__(self, size: int):
         self.size = size

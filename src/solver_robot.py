@@ -1,6 +1,7 @@
 import random
 from board import Board
 
+
 class LasVegasSolver:
     def __init__(self, size: int):
         self.size = size
