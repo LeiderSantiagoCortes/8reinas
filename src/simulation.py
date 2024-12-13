@@ -2,8 +2,10 @@ import random
 import simpy
 from solver_robot import LasVegasSolver
 from solver_professor import DeterministicSolver
+import time
 
-BOARD_SIZES = [4, 5, 6, 8, 10, 12, 15]  # Possible board sizes for the N-Queens problem
+# Possible board sizes for the N-Queens problem
+BOARD_SIZES = [4, 5, 6, 8, 10, 12, 15]
 
 
 class NQueensSimulation:
@@ -22,6 +24,11 @@ class NQueensSimulation:
         self.env = env
         self.profit = 0  # Tracks the total profit from the simulation
         self.sizes = BOARD_SIZES
+        # Dictionary to store real elapsed times separately for Las Vegas and Deterministic solvers
+        self.elapsed_times = {
+            "LasVegas": {size: [] for size in BOARD_SIZES},
+            "Deterministic": {size: [] for size in BOARD_SIZES},
+        }
 
     def generate_robots(self):
         """
@@ -31,7 +38,8 @@ class NQueensSimulation:
             # Wait for a random time between 10 and 30 seconds before generating the next robot
             timeout_duration = random.randint(10, 30)
             print(
-                f"Waiting for {timeout_duration} seconds before generating a new robot."
+                f"Waiting for {
+                    timeout_duration} seconds before generating a new robot."
             )
             yield self.env.timeout(timeout_duration)
             # Start a new game process
@@ -58,18 +66,32 @@ class NQueensSimulation:
         print(f"Robot will take {robot_time:.2f} seconds to solve.")
         print(f"Professor will take {professor_time:.2f} seconds to solve.")
 
-        # Simulate the solver times by yielding timeouts
+        # Measure and store the real elapsed time for the robot solver
+        robot_start_time = time.time()
         yield self.env.timeout(robot_time)
         print("Robot started solving the problem.")
         robot_solved = robot_solver.solve()
+        robot_elapsed_time = time.time() - robot_start_time
+        self.elapsed_times["LasVegas"][size].append(robot_elapsed_time)
+        print(f"Real elapsed time for Las Vegas solver on board size {
+              size}: {robot_elapsed_time:.2f} seconds.")
+
         if robot_solved:
             print("Robot successfully solved the problem.")
         else:
             print("Robot failed to solve the problem.")
 
+        # Measure and store the real elapsed time for the professor solver
+        professor_start_time = time.time()
         yield self.env.timeout(professor_time)
         print("Professor started solving the problem.")
         professor_solved = professor_solver.solve()
+        professor_elapsed_time = time.time() - professor_start_time
+        self.elapsed_times["Deterministic"][size].append(
+            professor_elapsed_time)
+        print(f"Real elapsed time for Deterministic solver on board size {
+              size}: {professor_elapsed_time:.2f} seconds.")
+
         if professor_solved:
             print("Professor successfully solved the problem.")
         else:
@@ -83,4 +105,5 @@ class NQueensSimulation:
             self.profit += 15  # Increase profit if the professor wins
             print(f"Professor has won. Profit: {self.profit}")
         else:
-            print(f"No solver could solve the problem. Profit remains: {self.profit}")
+            print(f"No solver could solve the problem. Profit remains: {
+                  self.profit}")
