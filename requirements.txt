@@ -9,3 +9,4 @@ PyYAML==6.0.2
 ruff==0.8.2
 simpy==4.1.1
 virtualenv==20.28.0
+matplotlib==3.4.3

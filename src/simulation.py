@@ -5,7 +5,7 @@ from solver_professor import DeterministicSolver
 import time
 
 # Possible board sizes for the N-Queens problem
-BOARD_SIZES = [4, 5, 6, 8, 10, 12, 15]
+
 
 
 class NQueensSimulation:
@@ -14,7 +14,7 @@ class NQueensSimulation:
     The simulation tracks the profit based on which solver wins each game.
     """
 
-    def __init__(self, env: simpy.Environment):
+    def __init__(self, env: simpy.Environment, simulation_config: dict):
         """
         Initialize the NQueensSimulation with the simulation environment.
 
@@ -22,12 +22,18 @@ class NQueensSimulation:
             env (simpy.Environment): The simulation environment.
         """
         self.env = env
+        self.sizes = simulation_config["sizes"]
+        
+        self.uniform_distribution = simulation_config["uniform_distribution"]
+        self.penalties = simulation_config["penalties"]
+        self.rewards = simulation_config["rewards"]
+        
         self.profit = 0  # Tracks the total profit from the simulation
-        self.sizes = BOARD_SIZES
+        
         # Dictionary to store real elapsed times separately for Las Vegas and Deterministic solvers
         self.elapsed_times = {
-            "LasVegas": {size: [] for size in BOARD_SIZES},
-            "Deterministic": {size: [] for size in BOARD_SIZES},
+            "LasVegas": {size: [] for size in self.sizes},
+            "Deterministic": {size: [] for size in self.sizes},
         }
 
     def generate_robots(self):
@@ -36,7 +42,7 @@ class NQueensSimulation:
         """
         while True:
             # Wait for a random time between 10 and 30 seconds before generating the next robot
-            timeout_duration = random.randint(10, 30)
+            timeout_duration = random.randint(self.uniform_distribution[0], self.uniform_distribution[1])
             print(
                 f"Waiting for {
                     timeout_duration} seconds before generating a new robot."
@@ -56,7 +62,7 @@ class NQueensSimulation:
         print(f"Selected board size: {size}x{size}")
 
         # Initialize the solvers with the selected board size
-        robot_solver = LasVegasSolver(size)
+        robot_solver = LasVegasSolver(size, self.uniform_distribution)
         professor_solver = DeterministicSolver(size)
 
         # Get the time taken by each solver to solve the problem
@@ -99,10 +105,10 @@ class NQueensSimulation:
 
         # Determine the winner based on whether they solved the problem
         if robot_solved and (not professor_solved or robot_time < professor_time):
-            self.profit -= 10  # Decrease profit if the robot wins
+            self.profit -= self.penalties  # Decrease profit if the robot wins
             print(f"Robot has won. Profit: {self.profit}")
         elif professor_solved:
-            self.profit += 15  # Increase profit if the professor wins
+            self.profit += self.rewards  # Increase profit if the professor wins
             print(f"Professor has won. Profit: {self.profit}")
         else:
             print(f"No solver could solve the problem. Profit remains: {
