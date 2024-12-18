@@ -3,7 +3,7 @@ from board import Board
 
 
 class LasVegasSolver:
-    def __init__(self, size: int):
+    def __init__(self, size: int, uniform_distribution: list):
         """
         Initialize the Las Vegas Solver with a given board size.
 
@@ -12,6 +12,7 @@ class LasVegasSolver:
         """
         self.size = size
         self.board = Board(size)
+        self.uniform_distribution = uniform_distribution
 
     def solve(self) -> bool:
         """
@@ -63,4 +64,4 @@ class LasVegasSolver:
         """
         Get the time taken by the solver to solve
         """
-        return random.uniform(10, 30)  # Random time between 10 and 30 seconds
+        return random.uniform(self.uniform_distribution[0], self.uniform_distribution[1])  # Random time between 10 and 30 seconds
