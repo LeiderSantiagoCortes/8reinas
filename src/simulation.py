@@ -105,10 +105,10 @@ class NQueensSimulation:
 
         # Determine the winner based on whether they solved the problem
         if robot_solved and (not professor_solved or robot_time < professor_time):
-            self.profit -= 10  # Decrease profit if the robot wins
+            self.profit -= self.penalties  # Decrease profit if the robot wins
             print(f"Robot has won. Profit: {self.profit}")
         elif professor_solved:
-            self.profit += 15  # Increase profit if the professor wins
+            self.profit += self.rewards  # Increase profit if the professor wins
             print(f"Professor has won. Profit: {self.profit}")
         else:
             print(f"No solver could solve the problem. Profit remains: {
